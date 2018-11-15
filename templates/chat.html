@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>咨询</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/static/img/small-logo-01.png">
+</head>
+<body style="background: url('/static/images/leaves.png');">
+<div class = "container">
+     {% for message in get_flashed_messages() %}
+         <div class="alert-warning">
+             <a href="" class="close">&times;</a>
+             {{ message }}
+         </div>
+     {% endfor %}
+</div>
+
+<div class="navbar navbar-inverse" role="navigation">
+         <div class="container">
+             <div class="navbar-header">
+                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                     <span class="sr-only">Toggle navigation</span>
+                     <span class="icon-bar"></span>
+                     <span class="icon-bar"></span>
+                     <span class="icon-bar"></span>
+                 </button>
+                 <a class="navbar-brand" href="{{ url_for('top') }}">主页</a>
+             </div>
+             <div class="navbar-collapse collapse">
+                 <ul class="nav navbar-nav">
+                     <li><a href="{{ url_for('chat') }}">刷新聊天室</a></li>
+                 </ul>
+                 <ul class="nav navbar-nav">
+                     <li><a href="{{ url_for('top') }}";onclik="close();" >退出聊天室</a></li>
+                 </ul>
+                 {% if current_user.is_authenticated %}
+                 <ul class="nav navbar-nav">
+                     <li><a href="{{ url_for('user', username=current_user.username) }}">个人资料</a></li>
+                 </ul>
+                 {% endif %}
+                 <ul class="nav navbar-nav navbar-right">
+                     <li><a>您好,{% if current_user.is_authenticated %}{{ current_user.username }}{% else %}匿名用户{% endif %}</a></li>
+                 </ul>
+                 <ul class="nav navbar-nav navbar-right">
+                     {% if current_user.is_authenticated %}
+                     <li><a href="{{ url_for('logout') }}">注销</a></li>
+                     {% else %}
+                     <li><a href="{{ url_for('login') }}">登录</a></li>
+                     {% endif %}
+                 </ul>
+             </div>
+         </div>
+</div>
+
+
+<div class="container-fluid">
+    <div class="row" >
+        <div  class="col-md-5" style="margin-left: 20%">
+            <h2 style="text-align: center">心理咨询</h2>
+            <div class="form-group">
+                <label for="username">用户：{{ current_user.username }}</label>
+{#                <input class="form-control" type="text" id="username">#}
+            </div>
+            <div class="form-group">
+                <label for="to_user">发送谁：</label>
+                <input class="form-control" type="text" id="to_user">
+            </div>
+{#            <button id="create_ws" onclick="go_to()" class="btn btn-warning">创建ws连接</button>#}
+            <div style="width: 100%;height: 300px;overflow:auto; border: double;background-color:white" id="chat_window" >
+            </div>
+
+             <div class="input-group">
+                  <input type="text" class="form-control" placeholder="" id="send_msg">
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" id="btn_send">发送消息</button>
+                  </span>
+                </div>
+              </div>
+        <div style=";float: left; width: 200px; height: 400px; border: double;background-color: white" id="online_window" >
+            <h5 style="text-align: center">在线列表</h5>
+                <div id="list" style="text-align: center;overflow: auto;width: 180px;height: 320px">
+
+                </div>
+
+            <div style="text-align: center"><button  onclick="fresh()">刷新</button></div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="application/javascript">
+    var ws_url = "ws://127.0.0.1:1024/ws/";
+    var ws = null;
+    user_socket_dict = [];
+    var username = '{{ current_user.username }}';
+    ws = new WebSocket(ws_url + username);
+    ws.onmessage = function (serv_msg) {
+        msg = JSON.parse(serv_msg.data);
+        user_socket_dict = msg.userlist;
+        if (msg.send_msg){
+            create_chart('y', msg)
+        }
+        if (msg.is_connect){
+            fresh()
+        }
+
+    };
+    ws.onopen = function () {
+              console.log('连接成功');
+              send_msg_json = {
+              type:'connect'
+              };
+              ws.send(JSON.stringify(send_msg_json));
+
+    };
+    ws.onclose = function () {
+              console.log("连接已关闭...");
+};
+    {#setInterval("fresh()",10000)#}
+
+
+    function close() {
+        ws.close();
+    }
+
+    function fresh() {
+        console.log(user_socket_dict,user_socket_dict.length);
+        document.getElementById("list").innerHTML = "";
+        for (var i = 0; i < user_socket_dict.length; i++) {
+            var _span = document.createElement("span") ;
+            var hr = document.createElement('hr');
+            _span.innerHTML = user_socket_dict[i];
+            var div_list = document.createElement("div");
+            div_list.id = 'list'+i.toString()
+            div_list.appendChild(_span);
+            div_list.appendChild(hr);
+            document.getElementById("list").appendChild(div_list);
+
+        }
+
+    }
+
+    function setname(name) {
+        document.getElementById("to_user").value = name
+    }
+
+    function create_chart(self, content) {
+        if (self == "w") {
+            self = "right";
+            var spantag = document.createElement("span");
+            spantag.innerText = content.send_msg;
+            var spantag1 = document.createElement("span");
+            spantag1.innerText = ' :我';
+        } else {
+            self = "left";
+            var spantag = document.createElement("span");
+            spantag.innerText = content.send_user + ':';
+
+            var spantag1 = document.createElement("span");
+            spantag1.innerText = content.send_msg;
+
+        }
+        var divtag = document.createElement("div");
+        divtag.style = "margin-top:20px;text-align:" + self;
+        divtag.appendChild(spantag);
+        divtag.appendChild(spantag1);
+        chat_window.appendChild(divtag);
+        chat_window.scrollTop = chat_window.scrollHeight;
+
+    }
+    document.getElementById("btn_send").addEventListener("click", function () {
+
+        var send_msg = document.getElementById("send_msg");
+        var to_user = document.getElementById("to_user");
+        send_msg_json = {
+            send_msg: send_msg.value,
+            to_user: to_user.value,
+            type:'chat'
+        };
+
+        ws.send(JSON.stringify(send_msg_json));
+        var s_msg = {send_msg: send_msg.value};
+        create_chart('w', s_msg);
+        send_msg.value = '';
+    })
+
+</script>
+</body>
+</html>

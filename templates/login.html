@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}登录{% endblock %}
+{% block styles %}
+    {{ super() }}
+    <style>
+    html,body{
+        background: url("/static/images/lr.jpg");
+    }
+    #div_login
+    {
+        background: rgba(255,255,255,0.8);
+        border-radius: 20px;
+        width: 300px;
+        height: 300px;
+        margin: auto;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+    </style>
+{% endblock %}
+{% block body %}
+    {% block content %}
+    {{ super() }}
+    {% endblock %}
+    <h1 align="center">网络心理咨询系统</h1>
+    <hr>
+
+    <div id="div_login" class="col-md-4" >
+        <td>{{ wtf.quick_form(form) }}</td>
+        <td><a href="/regist"><button style="color: black;background: aliceblue">注册</button></a></td>
+    </div>
+
+{% endblock %}

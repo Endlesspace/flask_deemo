@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+ {% import "bootstrap/wtf.html" as wtf %}
+
+ {% block title %}资料编辑{% endblock %}
+
+ {% block body %}
+ {% block navbar %}
+     {{ super() }}
+ {% endblock %}
+      <div class="wrapper">
+         <div class="page-header">
+             <h1>编辑你的资料</h1>
+         </div>
+         <div class="col-md-6">
+             {{ wtf.quick_form(form) }}
+         </div>
+      </div>
+ {% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <style>
+        html,body{
+            background: url("/static/images/leaves.png");
+        }
+        .wrapper{
+            width: 55%;
+            margin-left:30%;
+            background: white;
+            background:rgba(255,255,255,0.5);
+        }
+    </style>
+{% endblock %}
