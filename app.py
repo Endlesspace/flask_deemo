@@ -14,7 +14,7 @@ from datetime import datetime
 from flask_moment import Moment
 from flask_migrate import Migrate
 from random import randint
-from sqlalchemy.exc import  IntegrityError
+from sqlalchemy.exc import IntegrityError
 from faker import Faker
 
 pymysql.install_as_MySQLdb()
@@ -26,7 +26,7 @@ moment = Moment(app)
 app.secret_key = 'Friday'
 app.config.from_object(DevConfig)
 db = SQLAlchemy(app)
-admin = Admin(app, name='myadmin', template_mode='bootstrap3')
+admin = Admin(app, name='平台管理', template_mode='bootstrap3')
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
@@ -105,6 +105,7 @@ class Video(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.now)
     author = db.Column(db.String(255))
     address = db.Column(db.String(255))
+
 
 # 留言文章
 
@@ -185,10 +186,10 @@ class Role(db.Model):
     @staticmethod
     def insert_roles():
         roles = {
-            'User': [Permission.FOLLOW, Permission.COMMENT, Permission.WRITE],
-            'consultant': [Permission.FOLLOW, Permission.COMMENT,
+            '普通用户': [Permission.FOLLOW, Permission.COMMENT, Permission.WRITE],
+            '咨询师': [Permission.FOLLOW, Permission.COMMENT,
                            Permission.WRITE, Permission.MODERATE],
-            'Administrator': [Permission.FOLLOW, Permission.COMMENT,
+            '管理员': [Permission.FOLLOW, Permission.COMMENT,
                               Permission.WRITE, Permission.MODERATE,
                               Permission.ADMIN],
         }
@@ -269,9 +270,19 @@ def load_user(user_id):
 
 admin.add_view(ModelView(User, db.session))
 admin.add_view(ModelView(Role, db.session))
+admin.add_view(ModelView(Post, db.session))
+admin.add_view(ModelView(Comment, db.session))
 
 
 # 路由
+
+
+# 管理界面
+
+
+# @app.route('/admin')
+# @login_required
+
 
 # 资讯
 

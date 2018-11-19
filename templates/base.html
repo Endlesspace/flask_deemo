@@ -31,7 +31,7 @@
                  </ul>
                  {% endif %}
                  <ul class="nav navbar-nav navbar-right">
-                     <li><a>您好,{% if current_user.is_authenticated %}{{ current_user.username }}{% else %}匿名用户{% endif %}</a></li>
+                     <li><a>您好,{% if current_user.is_authenticated %}{{ current_user.role.name }}&nbsp;{{ current_user.username }}{% else %}匿名用户{% endif %}</a></li>
                  </ul>
                  <ul class="nav navbar-nav navbar-right">
                      {% if current_user.is_authenticated %}
