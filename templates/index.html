@@ -1,4 +1,5 @@
 <!DOCTYPE HTML>
+
 <html>
 
 <head>
@@ -24,46 +25,8 @@
 <!-- CACHE -->
 <div class="cache"></div>
 
-{#navbar#}
-    <div class="navbar navbar-inverse" role="navigation">
-             <div class="container">
-                 <div class="navbar-header">
-                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                         <span class="sr-only">Toggle navigation</span>
-                         <span class="icon-bar"></span>
-                         <span class="icon-bar"></span>
-                         <span class="icon-bar"></span>
-                     </button>
-                     <a class="navbar-brand" href="{{ url_for('top') }}">主页</a>
-                 </div>
-                 <div class="navbar-collapse collapse">
-                     <ul class="nav navbar-nav">
-                         <li><a href="{{ url_for('top') }}">留言板</a></li>
-                     </ul>
-                     <ul class="nav navbar-nav">
-                         <li><a href="{{ url_for('chat') }}">心理咨询</a></li>
-                     </ul>
-                     <ul class="nav navbar-nav">
-                         <li><a href="{{ url_for('res') }}">资讯</a></li>
-                     </ul>
-                     {% if current_user.is_authenticated %}
-                     <ul class="nav navbar-nav">
-                         <li><a href="{{ url_for('user', username=current_user.username) }}">个人资料</a></li>
-                     </ul>
-                     {% endif %}
-                     <ul class="nav navbar-nav navbar-right">
-                         <li><a>您好,{% if current_user.is_authenticated %}{{ current_user.username }}{% else %}匿名用户{% endif %}</a></li>
-                     </ul>
-                     <ul class="nav navbar-nav navbar-right">
-                         {% if current_user.is_authenticated %}
-                         <li><a href="{{ url_for('logout') }}">注销</a></li>
-                         {% else %}
-                         <li><a href="{{ url_for('login') }}">登录</a></li>
-                         {% endif %}
-                     </ul>
-                 </div>
-             </div>
-    </div>
+{#导航栏#}
+{% include '_navbar.html' %}
 
 <!-- NAVBAR -->
 
@@ -136,7 +99,7 @@
         </div>
     </div>
 
-<div class="tlinks">Collect from <a href="http://www.cssmoban.com/" >企业网站模板</a></div>
+<div class="tlinks">Collect from </div>
 <!-- PORTFOLIO -->
 
 	<div id="wrapper-container" style="display: block">
@@ -283,66 +246,7 @@
 <script type="text/javascript" src="/static/js/main.js"></script>
 <script>
 
-/* PRELOADER */
-
-function preloader() {
-	if (document.images) {
-		var img1 = new Image();
-		var img2 = new Image();
-		var img3 = new Image();
-		var img4 = new Image();
-		var img5 = new Image();
-		var img6 = new Image();
-		var img7 = new Image();
-		var img8 = new Image();
-		var img9 = new Image();
-		var img10 = new Image();
-		var img11 = new Image();
-		var img12 = new Image();
-		var img13 = new Image();
-		var img14 = new Image();
-		var img15 = new Image();
-		var img16 = new Image();
-		var img17 = new Image();
-		var img18 = new Image();
-		var img19 = new Image();
-		var img20 = new Image();
-
-		img1.src = "/static/img/psd-4.jpg";
-		img2.src = "/static/img/font-1.jpg";
-		img3.src = "/static/img/psd-1.jpg";
-		img4.src = "/static/img/psd-2.jpg";
-		img5.src = "/static/img/ai-1.jpg";
-		img6.src = "/static/img/theme-2.jpg";
-		img7.src = "/static/img/psd-3.jpg";
-		img8.src = "/static/img/font-2.jpg";
-		img9.src = "/static/img/font-3.jpg";
-		img10.src = "/static/img/ai-2.jpg";
-		img11.src = "/static/img/icons-1.jpg";
-		img12.src = "/static/img/ui-1.jpg";
-		img13.src = "/static/img/font-5.jpg";
-		img14.src = "/static/img/theme-2.jpg";
-		img15.src = "/static/img/psd-5.jpg";
-		img16.src = "/static/img/icons-3.jpg";
-		img17.src = "/static/img/font-4.jpg";
-		img18.src = "/static/img/theme-3.jpg";
-		img19.src = "/static/img/font-6.jpg";
-		img20.src = "/static/img/theme-4.jpg";
-	}
-}
-function addLoadEvent(func) {
-	var oldonload = window.onload;
-	if (typeof window.onload != 'function') {
-		window.onload = func;
-	} else {
-		window.onload = function() {
-			if (oldonload) {
-				oldonload();
-			}
-			func();
-		}
-	}
-}
+{#切换资讯与视频#}
 
 function showvideo(){
     document.getElementById('wrapper-container2').style.display = 'block';
@@ -353,7 +257,7 @@ function shownews(){
     document.getElementById('wrapper-container2').style.display = 'none';
     document.getElementById('wrapper-container').style.display = 'block';
 }
-addLoadEvent(preloader);
+
 
 </script>
 

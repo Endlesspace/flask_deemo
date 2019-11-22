@@ -2,7 +2,7 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% import "_macros.html" as macros %}
 {% block title %}网络心理咨询系统{% endblock %}
-{% block styles %}
+{% block head %}
     {{ super() }}
     <style>
          ul.posts {
@@ -68,6 +68,7 @@
              {{ macros.pagination_widget(pagination, '.top') }}
          </div>
          {% endif %}
+    </div>
 {% endblock %}
 
 {% block scripts %}

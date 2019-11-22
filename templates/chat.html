@@ -89,9 +89,9 @@
 </div>
 
 
-
+{#js实现ws连接#}
 <script type="application/javascript">
-    var ws_url = "ws://127.0.0.1:1024/ws/";
+    var ws_url = "ws://192.168.1.111:1024/ws/";
     var ws = null;
     user_socket_dict = [];
     var username = '{{ current_user.username }}';
@@ -150,9 +150,9 @@
         if (self == "w") {
             self = "right";
             var spantag = document.createElement("span");
-            spantag.innerText = content.send_msg;
+            spantag.innerText = content.send_msg ;
             var spantag1 = document.createElement("span");
-            spantag1.innerText = ' :我';
+            spantag1.innerText = ' :{{ current_user.username }}' ;
         } else {
             self = "left";
             var spantag = document.createElement("span");

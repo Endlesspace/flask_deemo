@@ -30,6 +30,11 @@
                      <li><a href="{{ url_for('user', username=current_user.username) }}">个人资料</a></li>
                  </ul>
                  {% endif %}
+                 {% if current_user.is_authenticated and current_user.role.name == '管理员' %}
+                 <ul class="nav navbar-nav">
+                     <li><a href="/admin">管理系统</a></li>
+                 </ul>
+                 {% endif %}
                  <ul class="nav navbar-nav navbar-right">
                      <li><a>您好,{% if current_user.is_authenticated %}{{ current_user.role.name }}&nbsp;{{ current_user.username }}{% else %}匿名用户{% endif %}</a></li>
                  </ul>

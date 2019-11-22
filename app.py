@@ -5,7 +5,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Radio
 from flask_sqlalchemy import SQLAlchemy
 from config import DevConfig
 import pymysql
-from flask_admin import Admin
+from flask_admin import Admin, BaseView, expose
 from flask_admin.contrib.sqla import ModelView
 from flask_bootstrap import Bootstrap
 from flask_login import UserMixin, login_user, LoginManager, AnonymousUserMixin, current_user, logout_user, \
@@ -13,9 +13,10 @@ from flask_login import UserMixin, login_user, LoginManager, AnonymousUserMixin,
 from datetime import datetime
 from flask_moment import Moment
 from flask_migrate import Migrate
-from random import randint
 from sqlalchemy.exc import IntegrityError
 from faker import Faker
+import time
+# print(time.strftime('%Y%m%d%H%M%S',time.localtime(time.time())))
 
 pymysql.install_as_MySQLdb()
 
@@ -33,11 +34,17 @@ login_manager.init_app(app)
 migrate = Migrate(app, db)
 
 
-# socketio = SocketIO(app)
-# socketio.init_app(app)
+# Model
 
 
-##
+class AdminModelView(ModelView):
+    def is_accessible(self):
+        return current_user.role.name == '管理员'
+
+    def inaccessible_callback(self, name, **kwargs):
+        # redirect to login page if user doesn't have access
+        print("没有权限")
+        return redirect(url_for('login', next=request.url))
 
 
 # 用户资料编辑
@@ -64,12 +71,33 @@ class Registform(FlaskForm):
     submit = SubmitField('提交')
 
 
+# 留言表格
+
+
 class PostForm(FlaskForm):
     body = TextAreaField("我想留言", validators=[DataRequired()])
     submit = SubmitField('提交')
 
 
+# 编辑自己留言的表格
+
+
+class ChangeForm(FlaskForm):
+    body = TextAreaField("更改留言", validators=[DataRequired()])
+    submit = SubmitField('提交并返回')
+
+
+# 从管理员页面退出
+
+
+class Myexit(BaseView):
+    @expose('/', methods=['GET', 'POST'])
+    def admin_index(self):
+        return redirect(url_for('top'))
+
+
 # 咨询文章
+
 
 class Respost(db.Model):
     __tablename__ = 'resposts'
@@ -145,16 +173,16 @@ class Comment(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
 
 
-#     @staticmethod
-#     def on_changed_body(target, value, oldvalue, initiator):
-#         allowed_tags = ['a', 'abbr', 'acronym', 'b', 'code', 'em', 'i',
-#                         'strong']
-#         target.body_html = bleach.linkify(bleach.clean(
-#             markdown(value, output_format='html'),
-#             tags=allowed_tags, strip=True))
-#
-#
-# db.event.listen(Comment.body, 'set', Comment.on_changed_body)
+# 预约单类
+class Order(db.Model):
+    __tablename__ = 'order'
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.String(10))
+    order_time = db.Column(db.DateTime, index=True, default=datetime.now)
+    order_from = db.Column(db.Integer, db.ForeignKey('users.id'))
+    order_to = db.Column(db.Integer, db.ForeignKey('users.id'))
+    state = db.Column(db.Integer)  # 未处理（0）/已取消（1）/已结束（2）
+
 
 # 留言评论
 
@@ -188,10 +216,10 @@ class Role(db.Model):
         roles = {
             '普通用户': [Permission.FOLLOW, Permission.COMMENT, Permission.WRITE],
             '咨询师': [Permission.FOLLOW, Permission.COMMENT,
-                           Permission.WRITE, Permission.MODERATE],
+                    Permission.WRITE, Permission.MODERATE],
             '管理员': [Permission.FOLLOW, Permission.COMMENT,
-                              Permission.WRITE, Permission.MODERATE,
-                              Permission.ADMIN],
+                    Permission.WRITE, Permission.MODERATE,
+                    Permission.ADMIN],
         }
         # default_role = 'User'
         for r in roles:
@@ -252,6 +280,7 @@ class User(UserMixin, db.Model):
         return "<User '{}'>".format(self.username)
 
 
+# 匿名用户
 class AnonymousUser(AnonymousUserMixin):
     def can(self, permissions):
         return False
@@ -268,20 +297,14 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-admin.add_view(ModelView(User, db.session))
-admin.add_view(ModelView(Role, db.session))
-admin.add_view(ModelView(Post, db.session))
-admin.add_view(ModelView(Comment, db.session))
+admin.add_view(AdminModelView(User, db.session))
+admin.add_view(AdminModelView(Role, db.session))
+admin.add_view(AdminModelView(Post, db.session))
+admin.add_view(AdminModelView(Comment, db.session))
+admin.add_view(Myexit(name='exit'))
 
 
 # 路由
-
-
-# 管理界面
-
-
-# @app.route('/admin')
-# @login_required
 
 
 # 资讯
@@ -301,6 +324,7 @@ def res():
     videos = pagination2.items
     return render_template('index.html', news=news, pagination=pagination, videos=videos, pagination2=pagination2)
 
+
 # 新闻详情
 
 
@@ -308,6 +332,7 @@ def res():
 def news(id):
     respost = Respost.query.filter_by(id=id).first_or_404()
     return render_template('details.html', respost=respost, type='n')
+
 
 # 视频
 
@@ -336,13 +361,13 @@ def edit(id):
     if current_user != post.author and \
             not current_user.can(Permission.ADMIN):
         abort(403)
-    form = PostForm()
+    form = ChangeForm()
     if form.validate_on_submit():
         post.body = form.body.data
         db.session.add(post)
         db.session.commit()
         flash('留言已更新')
-        return redirect(url_for('.post', id=post.id))
+        return redirect(url_for('.top'))
     form.body.data = post.body
     return render_template('edit_post.html', form=form)
 
@@ -392,7 +417,13 @@ def logout():
     return redirect(url_for('top'))
 
 
-# 主界面(留言板)
+# 主界面
+@app.route('/home', methods=['GET', 'POST'])
+def home():
+    return render_template('home.html')
+
+
+# 留言板
 
 
 @app.route('/', methods=['GET', 'POST'])
