@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>咨询</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/static/img/small-logo-01.png">
+    <script type="text/javascript" src="/static/js/jquery-3.3.1.js"></script>
+</head>
+<body style="background: url('/static/images/leaves.png');">
+<div class="container">
+    {% for message in get_flashed_messages() %}
+        <div class="alert-warning">
+            <a href="" class="close">&times;</a>
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+
+<div class="navbar navbar-inverse" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="javascript:reconnect();">刷新聊天室</a></li>
+            </ul>
+            <ul class="nav navbar-nav">
+                <li><a href="javascript:window.location.href='{{ url_for('top') }}'">退出聊天室</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a>您好,{% if current_user.is_authenticated %}{{ current_user.username }}{% else %}匿名用户{% endif %}</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('logout') }}">注销</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">登录</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-5" style="margin-left: 20%">
+            <h2 style="text-align: center">心理咨询</h2>
+            <div class="form-group">
+                <label for="username" style="width: 100px">用户：{{ current_user.username }}</label>
+                <label id="count" for="username" style="margin-left: 80px"></label>
+            </div>
+            <div class="form-group">
+                <label for="to_user">发送谁：</label>
+                <input class="form-control" type="text" id="to_user">
+            </div>
+
+            <div style="width: 100%;height: 300px;overflow:auto; border: double;background-color:white"
+                 id="chat_window">
+            </div>
+
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="" id="send_msg">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" id="btn_send">发送消息</button>
+                  </span>
+            </div>
+        </div>
+        <div style="float: left; width: 200px; height: 400px; border: double;background-color: white"
+             id="online_window">
+            <h5 style="text-align: center">在线列表</h5>
+            <div id="list" style="text-align: center;overflow: auto;width: 180px;height: 320px">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{#js实现ws连接#}
+<script type="application/javascript">
+    var count;
+    var ws_url = "ws://211.83.111.224:8024/ws/";
+    var ws = null;
+    var user_socket_dict = [];
+    var username = '{{ current_user.username }}';
+    ws = new WebSocket(ws_url + username);
+    ws.onmessage = function (serv_msg) {
+        msg = JSON.parse(serv_msg.data);
+        if (msg.userlist) {
+            user_socket_dict = msg.userlist.split("-");
+
+        }
+        console.log(user_socket_dict);
+        if (msg.send_msg) {
+            create_chart('y', msg)
+        }
+        if (msg.is_connect) {
+            fresh();
+        }
+    };
+    ws.onopen = function () {
+        console.log('连接成功');
+        send_msg_json = {
+            type: 'connect'
+        };
+        ws.send(JSON.stringify(send_msg_json));
+
+    };
+    ws.onclose = function () {
+        console.log("连接已关闭...");
+    };
+    //传值设置姓名
+    $(function () {
+        var result;
+        var url = window.location.search; //获取url中"?"符后的字串
+        if (url.indexOf("?") != -1) {
+            result = url.substr(url.indexOf("=") + 1);
+            document.getElementById("to_user").value = result;
+            $.ajax({
+                url: '{{ url_for('.queue') }}',
+                method: "POST",
+                dataType: "JSON",
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify({
+                    "doctor": result
+                }),
+                success: function (data) {
+                    if (count) {
+                        count = data.count;
+                        document.getElementById("count").innerText = "您前面还有" + count + "人";
+                    }
+
+                },
+                error: function () {
+                    console.log('错误');
+                }
+            })
+        }
+    })
+    //非咨询师隐藏在线列表
+    $(function () {
+        var role_id =
+        {{ current_user.role_id }}
+        if (role_id == 1) {
+            document.getElementById('online_window').style = "display:none";
+            document.getElementById('to_user').disabled = "disabled";
+        }
+    })
+
+
+    // 刷新重连
+    function reconnect() {
+        ws.close();
+        ws = new WebSocket(ws_url + username);
+        ws.onmessage = function (serv_msg) {
+            msg = JSON.parse(serv_msg.data);
+            user_socket_dict = msg.userlist.split("-");
+            console.log(user_socket_dict);
+            if (msg.send_msg) {
+                create_chart('y', msg)
+            }
+            if (msg.is_connect) {
+                fresh();
+            }
+        };
+        ws.onopen = function () {
+            console.log('连接成功');
+            send_msg_json = {
+                type: 'connect'
+            };
+            ws.send(JSON.stringify(send_msg_json));
+
+        };
+        ws.onclose = function () {
+            console.log("连接已关闭...");
+        };
+    }
+
+    //刷新在线列表
+    function fresh() {
+        document.getElementById("list").innerHTML = "";
+        for (let i = 0; i < user_socket_dict.length; i++) {
+            var _span = document.createElement("span");
+            var hr = document.createElement('hr');
+            _span.innerHTML = user_socket_dict[i];
+            _span.id = "name" + i;
+            var div_list = document.createElement("div");
+            div_list.id = 'list' + i;
+            div_list.addEventListener("click", function () {
+                document.getElementById("to_user").value = String(user_socket_dict[i]);
+            })
+            div_list.appendChild(_span);
+            div_list.appendChild(hr);
+            document.getElementById("list").appendChild(div_list);
+
+        }
+
+    }
+
+
+    //根据收到的信息创建聊天窗口
+    function create_chart(self, content) {
+        if (self == "w") {
+            self = "right";
+            var spantag = document.createElement("span");
+            spantag.innerText = content.send_msg;
+            var spantag1 = document.createElement("span");
+            spantag1.innerText = ' :{{ current_user.username }}';
+        } else {
+            self = "left";
+            var spantag = document.createElement("span");
+            spantag.innerText = content.send_user + ':';
+            var spantag1 = document.createElement("span");
+            spantag1.innerText = content.send_msg;
+
+        }
+        var divtag = document.createElement("div");
+        divtag.style = "margin-top:20px;text-align:" + self;
+        divtag.appendChild(spantag);
+        divtag.appendChild(spantag1);
+        chat_window.appendChild(divtag);
+        chat_window.scrollTop = chat_window.scrollHeight;
+
+    }
+
+    // 发送消息到服务器
+    document.getElementById("btn_send").addEventListener("click", function () {
+
+        var send_msg = document.getElementById("send_msg");
+        var to_user = document.getElementById("to_user");
+        send_msg_json = {
+            send_msg: send_msg.value,
+            to_user: to_user.value,
+            type: 'chat'
+        };
+
+        ws.send(JSON.stringify(send_msg_json));
+        //显示自己的聊天信息，并清空发送窗口
+        var s_msg = {send_msg: send_msg.value};
+        create_chart('w', s_msg);
+        send_msg.value = '';
+    })
+    //离开页面自动关闭websocket连接
+    window.onbeforeunload = function () {
+        send_json = {
+            type: 'close'
+        };
+        ws.send(JSON.stringify(send_json));
+        ws.close();
+    }
+</script>
+</body>
+</html>

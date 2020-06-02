@@ -1,0 +1,257 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+{% import "_macros.html" as macros %}
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>资讯</title>
+
+<!-- Behavioral Meta Data -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="icon" type="image/png" href="/static/img/small-logo-01.png">
+<link href='/static/js/css1_roboto.css' rel='stylesheet' type='text/css'>
+<link href='/static/js/Pacifico.css' rel='stylesheet' type='text/css'>
+<link href="/static/js/bootstrap.min.css" rel="stylesheet" />
+<link href='/static/css/style.css' rel='stylesheet' type='text/css'>
+
+
+</head>
+<body style="background: url('/static/images/leaves.png');">
+
+<a name="ancre"></a>
+
+<!-- CACHE -->
+<div class="cache"></div>
+
+{#导航栏#}
+{% include '_navbar.html' %}
+
+<!-- NAVBAR -->
+
+<div id="wrapper-navbar">
+		<div class="navbar object">
+    		<div id="wrapper-sorting">
+            <div id="wrapper-title-1">
+            <div class="top-rated object" onclick="shownews()" >NEWS</div>
+            	<div id="fleche-nav-1"></div>
+    		</div>
+            
+            <div id="wrapper-title-2">
+            <div class="recent object" onclick="showvideo()">Videos</div>
+                <div id="fleche-nav-2"></div>
+    		</div>
+            
+            <div id="wrapper-title-3" style="display: none;">
+            <a href="#"><div class="oldies object">Oldies</div></a>
+                <div id="fleche-nav-3"></div>
+    		</div>
+            </div>
+    	</div>
+    </div>
+
+<!-- FILTER -->	
+
+	<div id="main-container-menu" class="object">
+    	<div class="container-menu">
+        	
+            <div id="main-cross">
+            	<div id="cross-menu"></div>
+            </div>
+            
+            <div id="main-small-logo">
+            	<div class="small-logo"></div>
+            </div>
+            
+            <div id="main-premium-ressource">
+                <div class="premium-ressource"><a href="#">Premium resources</a></div>
+            </div>
+            
+            <div id="main-themes">
+                <div class="themes"><a href="#">Latest themes</a></div>
+            </div>
+            
+            <div id="main-psd">
+                <div class="psd"><a href="#">PSD goodies</a></div>
+            </div>
+                
+            <div id="main-ai">
+                <div class="ai"><a href="#">Illustrator freebies</a></div>
+            </div>
+            
+            <div id="main-font">
+                <div class="font"><a href="#">Free fonts</a></div>
+            </div>
+            
+            <div id="main-photo">
+                <div class="photo"><a href="#">Free stock photos</a></div>
+            </div>
+            
+        </div>
+    </div>
+
+<div class="tlinks">Collect from </div>
+<!-- PORTFOLIO -->
+
+	<div id="wrapper-container" style="display: block">
+    
+		<div class="container object">
+
+			<div id="main-container-image">
+                       
+					<section class="work">
+                        {% for item in news %}
+                            <figure class="white">
+                                <a href="/details/news/{{ item.id }}">
+                                    <img src="/static/img/psd-4.jpg" alt="" />
+                                    <dl>
+                                        <dt >{{ item.title }}<br></dt>
+                                        <dd>{{ item.body }}</dd>
+                                    </dl>
+                                </a>
+                                <div id="wrapper-part-info">
+                                    <div class="part-info-image"><img src="/static/img/icon-psd.svg" alt="" width="28" height="28"/></div>
+                                    <div id="part-info" >{{ item.title }}</div>
+                                </div>
+                            </figure>
+                        {% endfor %}
+                        
+					</section>
+                    
+				</div>	
+            	    
+			</div>
+         
+    <div id="wrapper-oldnew" >
+    	<div class="oldnew">
+        	<div class="wrapper-oldnew-prev">
+            	<div id="oldnew-prev"></div>
+        	</div>
+            <div class="wrapper-oldnew-next">
+            	<div id="oldnew-next"></div>
+    		</div>
+        </div>
+        {% if pagination %}
+         <div class="pagination">
+             {{ macros.pagination_widget(pagination, '.res') }}
+         </div>
+         {% endif %}
+	</div>     
+            
+	<div id="wrapper-thank" style="display: none">
+    	<div class="thank">
+        	<div class="thank-text">pl<span style="letter-spacing:-5px;">a</span>tz</div>
+    	</div>
+	</div>
+	    
+	<div id="main-container-footer" style="display: none">
+		<div class="container-footer">
+        	
+            <div id="row-1f">
+            	<div class="text-row-1f"><span style="font-weight:600;font-size:15px;color:#666;line-height:250%;text-transform:uppercase;letter-spacing:1.5px;">What is Platz</span><br>Platz is a blog showcasing hand-picked free themes, design stuff, free fonts and other resources for web designers.</div>
+            </div>
+            
+            <div id="row-2f">
+            	<div class="text-row-2f"><span style="font-weight:600;font-size:15px;color:#666;line-height:250%;text-transform:uppercase;letter-spacing:1.5px;">How does it work</span><br>Platz offers you all the latest freebies found all over the fourth corners without to pay.</div>
+            </div>
+            
+            <div id="row-3f">
+            	<div class="text-row-3f"><span style="font-weight:600;font-size:15px;color:#666;line-height:250%;text-transform:uppercase;letter-spacing:1.5px;">Get in touch!</span><br>Subscribe our RSS or follow us on Facebook, Google+, Pinterest or Dribbble to keep updated.</div>
+            </div>
+            
+            <div id="row-4f">
+            	<div class="text-row-4f"><span style="font-weight:600;font-size:15px;color:#666;line-height:250%;text-transform:uppercase;letter-spacing:1.5px;">Newsletter</span><br>You will be informed monthly about the latest content avalaible.</div>
+
+				<div id="main_tip_newsletter"> 
+					<form>
+						<input type="text" name="newsletter" id="tip_newsletter_input" list="newsletter" autocomplete=off required>
+					</form>
+				</div>
+            </div>
+            
+		</div>
+	</div>
+    
+    
+    <div id="wrapper-copyright" style="display: none">
+		<div class="copyright">
+    		<div class="copy-text object">Copyright &copy; 2016.Company name All rights reserved.More Templates <a href="http://www.cssmoban.com/" target="_blank" title="模板之家">##</a> - Collect from <a href="http://www.cssmoban.com/" title="网页模板" target="_blank">##</a></div>
+    		
+			<div class="wrapper-navbouton">
+    			<div class="google object">g</div>
+    			<div class="facebook object">f</div>
+    			<div class="linkin object">i</div>
+    			<div class="dribbble object">d</div>
+    		</div>
+    	</div>
+    </div>
+
+</div>
+    <div id="wrapper-container2"style="display: none;margin-top: 60px;background:#f4f4f4 ;">
+
+		<div class="container object">
+
+			<div id="main-container-image2">
+					<section class="work">
+                        {% for item in videos %}
+                            <figure class="white">
+                                <a href="/details/video/{{ item.id }}">
+                                    <img src="/static/img/psd-4.jpg" alt="" />
+                                    <dl >
+                                        <dt >{{ item.title }}<br></dt>
+                                        <dd>{{ item.instruction }}</dd>
+                                    </dl>
+                                </a>
+                                <div id="wrapper-part-info2">
+                                    <div class="part-info-image"><img src="/static/img/icon-psd.svg" alt="" width="28" height="28"/></div>
+                                    <div id="part-info2" >{{ item.title }}</div>
+                                </div>
+                            </figure>
+                        {% endfor %}
+
+					</section>
+
+				</div>
+
+			</div>
+
+    <div id="wrapper-oldnew2" style="text-align: center" >
+        {% if pagination2 %}
+         <div class="pagination">
+             {{ macros.pagination_widget(pagination2, '.res') }}
+         </div>
+         {% endif %}
+	</div>
+
+</div>
+
+<!-- SCRIPT -->
+
+<script src="/static/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery.scrollTo.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery.localScroll.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery-animate-css-rotate-scale.js"></script>
+<script type="text/javascript" src="/static/js/fastclick.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery.animate-colors-min.js"></script>
+<script type="text/javascript" src="/static/js/jquery.animate-shadow-min.js"></script>    
+<script type="text/javascript" src="/static/js/main.js"></script>
+<script>
+
+{#切换资讯与视频#}
+
+function showvideo(){
+    document.getElementById('wrapper-container2').style.display = 'block';
+    document.getElementById('wrapper-container').style.display = 'none';
+}
+
+function shownews(){
+    document.getElementById('wrapper-container2').style.display = 'none';
+    document.getElementById('wrapper-container').style.display = 'block';
+}
+
+
+</script>
+
+</body>
+</html>

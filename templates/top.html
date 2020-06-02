@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+{% block title %}网络心理咨询系统{% endblock %}
+{% block head %}
+    {{ super() }}
+    <style>
+        ul.posts {
+            list-style-type: none;
+            padding: 0px;
+            margin: 16px 0px 0px 0px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        ul.posts li.post {
+            padding: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        ul.posts li.post:hover {
+            background-color: #f0f0f0;
+        }
+
+        div.post-date {
+            float: right;
+
+        }
+
+        div.post-author {
+            font-weight: bold;
+        }
+
+        div.post-thumbnail {
+            position: absolute;
+        }
+
+        div.post-content {
+            margin-left: 55px;
+            min-height: 55px;
+        }
+
+        div.wrapper-content {
+            width: 55%;
+            margin: 0 auto;
+            background: white;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        html, body {
+            background: url("/static/images/leaves.png");
+        }
+
+        live2dcanvas {
+            border: 0 !important;
+        }
+
+    </style>
+{% endblock %}
+{% block body %}
+    {% block content %}
+        {{ super() }}
+    {% endblock %}
+    {% block navbar %}
+        {{ super() }}
+    {% endblock %}
+    <div class="wrapper-content">
+        <div>
+            <h1>留言板</h1>
+            <hr>
+        </div>
+
+        <div class="col-lg-offset-0-8">
+            {% if current_user.can(Permission.WRITE) %}
+                {{ wtf.quick_form(form) }}
+            {% endif %}
+        </div>
+        {% include '_post.html' %}
+        {% if pagination %}
+            <div class="pagination">
+                {{ macros.pagination_widget(pagination, '.top') }}
+            </div>
+        {% endif %}
+    </div>
+
+    {% block scripts %}
+    {{ super() }}
+    {{ moment.include_moment(local_js=url_for('static',filename='js/moment-with-locales.min.js')) }}
+    {{ moment.locale('zh-cn') }}
+    <script type="text/javascript" charset="utf-8" src="/static/js/L2Dwidget.0.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/static/js/L2Dwidget.min.js"></script>
+    <script type="text/javascript">
+        L2Dwidget.init({
+            "display": {
+                "superSample": 2,
+                "width": 200,
+                "height": 400,
+                "position": "right",
+                "hOffset": 0,
+                "vOffset": 0
+            }
+        });
+    </script>
+{% endblock %}
+{% endblock %}
+
+
+
+
+

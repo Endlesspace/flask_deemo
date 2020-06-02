@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+<html lang="en">
+{% block title %}网络心理咨询系统{% endblock %}
+{% block head %}
+    {{ super() }}
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="/static/js/jquery-3.3.1.js"></script>
+    <style>
+        ul.posts {
+            list-style-type: none;
+            padding: 0px;
+            margin: 16px 0px 0px 0px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        ul.posts li.post {
+            padding: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        ul.posts li.post:hover {
+            background-color: #f0f0f0;
+        }
+
+        div.post-date {
+            float: right;
+
+        }
+
+        div.post-author {
+            font-weight: bold;
+        }
+
+        div.post-thumbnail {
+            position: absolute;
+            height: 50px;
+            width: 50px;
+        }
+
+        div.post-content {
+            margin-left: 55px;
+            min-height: 55px;
+        }
+
+        div.wrapper-content {
+            width: 55%;
+            margin: 0 auto;
+            background: white;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        html, body {
+            background: url("/static/images/leaves.png");
+        }
+
+    </style>
+{% endblock %}
+
+
+{% block body %}
+    {% block content %}
+        {{ super() }}
+    {% endblock %}
+    {% block navbar %}
+        {{ super() }}
+    {% endblock %}
+    <div class="wrapper-content">
+        <div class="col-md-10">
+            <a href="/order">
+                <div style="float: left"><h1>{{ option }}</h1></div>
+            </a>
+            <div style="float: left;width: 200px;height: 69px;text-align:center;position: relative">
+                <span style="position: absolute;left:50px;bottom: 10px;">{% if count %}还有{{ count }}
+                    人未处理{% endif %}</span></div>
+            <div style="float: right">
+                <a href="/order/all">
+                    <h3
+                            style="background-color: #b8daff;padding:.2em .6em .3em;line-height: 1;border-radius: .25em;color: mintcream;">
+                        全部预约</h3></a>
+            </div>
+            <hr>
+        </div>
+        <div class="col-lg-10" style="margin:0 auto;border-style:solid;height: 600px;overflow: auto">
+            <div class="posts">
+                {% for item in items %}
+                    <li class="post">
+                        <div class="post-thumbnail">
+                            <img src="{{ url_for('static', filename='images/3.jpg') }}" height="50" width="50"/>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-author">预约日期：{{ item.Order.appointment_time.strftime("%Y-%m-%d") }}</div>
+                            <div class="post-body">
+                                <span>订单号:
+                                    {{ item.Order.order_id }}
+                                </span>
+                                <span style="margin-left: 80px">预约人:
+                                    {{ item.User.username }}
+                                </span>
+                                {% if item.Order.state == 1 %}
+                                    <span class="label label-primary"
+                                          style="float:right;background-color: red">已取消</span>
+                                {% elif item.Order.state == 2 %}
+                                    <span class="label label-primary"
+                                          style="float:right;background-color: #8a6d3b">已结束</span>
+                                {% else %}
+                                    <a href="#" onclick="fun({{ item.Order.order_id }});">
+                                    <span class="label label-primary"
+                                          style="float:right;background-color: #FF9000">结束订单</span>
+                                    </a>
+                                    <a href="#"
+                                       onclick="window.location.href='http://211.83.111.224:5000/chat?valus={{ item.User.username }}'">
+                                    <span class="label label-primary"
+                                          style="float:right;background-color: #0069d9">去处理</span>
+                                    </a>
+                                    <span class="label label-primary"
+                                          style="float:right;background-color: #FF9000">未处理</span>
+                                {% endif %}
+                            </div>
+
+                    </li>
+                {% endfor %}
+            </div>
+        </ul>
+        {% if pagination %}
+            <div class="pagination">
+                {{ macros.pagination_widget(pagination, 'appointments') }}
+            </div>
+        {% endif %}
+    </div>
+    </div>
+    <script>
+        function fun(order_id) {
+            $.ajax({
+                url: '{{ url_for('.end') }}',
+                method: "post",
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify({
+                    "order_id": order_id
+                })
+            })
+            setTimeout("window.location.href='{{ url_for("order") }}'",1000)
+        }
+    </script>
+{% endblock %}
+</html>

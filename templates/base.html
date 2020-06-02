@@ -1,0 +1,21 @@
+{% extends "bootstrap/base.html" %}
+    {% block head %}
+        {{ super() }}
+        <link rel="icon" type="image/png" href="/static/img/small-logo-01.png">
+    {% endblock %}
+    {% block navbar %}
+       {% include '_navbar.html' %}
+    {% endblock navbar %}
+{% block body %}
+{#    消息提醒#}
+    {% block content %}
+        <div class = "container">
+               {% for message in get_flashed_messages() %}
+                   <div class="alert-warning">
+                       <a href="" class="close">&times;</a>
+                       {{ message }}
+                   </div>
+               {% endfor %}
+        </div>
+    {% endblock %}
+{% endblock %}

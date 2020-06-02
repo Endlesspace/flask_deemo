@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+<html lang="en">
+{% block title %}网络心理咨询系统{% endblock %}
+{% block head %}
+    {{ super() }}
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="/static/js/jquery-3.3.1.js"></script>
+    <style>
+        ul.posts {
+            list-style-type: none;
+            padding: 0px;
+            margin: 16px 0px 0px 0px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        ul.posts li.post {
+            padding: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        ul.posts li.post:hover {
+            background-color: #f0f0f0;
+        }
+
+        div.post-date {
+            float: right;
+
+        }
+
+        div.post-author {
+            font-weight: bold;
+        }
+
+        div.post-thumbnail {
+            position: absolute;
+            height: 50px;
+            width: 50px;
+        }
+
+        div.post-content {
+            margin-left: 55px;
+            min-height: 55px;
+        }
+
+        div.wrapper-content {
+            width: 55%;
+            margin: 0 auto;
+            background: white;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        html, body {
+            background: url("/static/images/leaves.png");
+        }
+
+    </style>
+{% endblock %}
+
+
+{% block body %}
+    {% block content %}
+        {{ super() }}
+    {% endblock %}
+    {% block navbar %}
+        {{ super() }}
+    {% endblock %}
+    <div class="wrapper-content">
+        <div class="col-md-10">
+            <div style="float: left"><h1>咨询师列表</h1></div>
+            <div style="float: right">
+                <a href="/appointments">
+                    <h3
+                            style="background-color: #b8daff;padding:.2em .6em .3em;line-height: 1;border-radius: .25em;color: mintcream;">
+                        我的预约</h3></a>
+            </div>
+            <hr>
+        </div>
+        <div class="col-lg-10" style="margin:0 auto;border-style:solid;height: 600px;overflow: auto">
+            <ul class="posts">
+                {% for doctor in doctors %}
+                    <li class="post">
+                        <div class="post-thumbnail" style="border-style:ridge">
+                            <img src="{{ url_for('static', filename='images/2.jpg') }}" height="50" width="50"/>
+                        </div>
+                        <div class="post-content">
+                            <div class="post-author">{{ doctor.username }}</div>
+                            <div class="post-body">
+                                <span>简介:</span>
+                                {% if doctor.about_me %}
+                                    {{ doctor.about_me }}
+                                {% endif %}
+                            </div>
+                            <div class="post-footer">
+                                <a href="#" onclick="fun($('#meeting_{{ loop.index }}').val(),{{ doctor.id }})">
+                                    <span class="label label-default" style="background-color: #5cb85c">预约</span>
+                                </a>
+                                <span class="label label-primary">预约日期(一周内)</span>
+                                <input id="meeting_{{ loop.index }}" type="date"/>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+            {% if pagination %}
+                <div class="pagination">
+                    {{ macros.pagination_widget(pagination, '.order') }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% block scripts %}
+    <script>
+        function fun(p1, p2) {
+            if (typeof p1 == "undefined" || p1 == null || p1 == "") {
+                alert("请选择预约日期");
+            } else {
+                $.ajax({
+                    url: '{{ url_for('.create') }}',
+                    method: "post",
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify({
+                        "time": p1,
+                        "to_d": p2,
+                        "from_p":{{ current_user.id }}
+                    }),
+                    success: function (data) {
+                        if (data.ok == true) {
+                            alert('订单创建成功');
+                        } else {
+                            alert("您还有该医生的预约未进行！");
+                        }
+                    },
+                    error: function () {
+                        console.log('错误');
+                    }
+                })
+            }
+
+
+        }
+
+        $(function () {
+            var dd = new Date();
+            dd.setDate(dd.getDate() + 7);//获取AddDayCount天后的日期
+            var y = dd.getFullYear();
+            var m = (dd.getMonth() + 1) < 10 ? "0" + (dd.getMonth() + 1) : (dd.getMonth() + 1);//获取当前月份的日期，不足10补0
+            var d = dd.getDate() < 10 ? "0" + dd.getDate() : dd.getDate();//获取当前几号，不足10补0
+            var s = y + "-" + m + "-" + d
+            //获取今天年月日
+            var dd1 = new Date();
+            var y1 = dd1.getFullYear();
+            var m1 = (dd1.getMonth() + 1) < 10 ? "0" + (dd1.getMonth() + 1) : (dd1.getMonth() + 1);//获取当前月份的日期，不足10补0
+            var d1 = dd1.getDate() < 10 ? "0" + dd1.getDate() : dd1.getDate();//获取当前几号，不足10补0
+            var s1 = y1 + "-" + m1 + "-" + d1
+            $("input[type='date']").attr("max", s);
+            $("input[type='date']").attr("min", s1);
+
+        })
+    </script>
+    {% endblock %}
+{% endblock %}
+
+</html>

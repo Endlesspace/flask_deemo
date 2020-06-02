@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+{% block head %}
+    <title>网络心理咨询系统</title>
+    <link href="/static/js/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/static/css/style.default.css" rel="stylesheet"/>
+    <style>
+        html, body {
+            background: url("/static/images/leaves.png");
+        }
+
+        .img-fluid-1 {
+            margin:0 auto;
+            height: 400px;
+            width: 650px;
+        }
+
+    </style>
+{% endblock %}
+
+{% block body %}
+
+    <!-- Hero Section-->
+    <section class="py-5">
+        <div class="container py-5">
+            <div class="row" style="text-align: center">
+                <h1 class="text-xl" align="center">欢迎来到 <span class="text-primary">网络心理咨询系统</span></h1>
+            </div>
+        </div>
+    </section>
+    <!-- Works Section-->
+    <section class="pt-5">
+
+        <div class="container">
+            <h2 class="h1 text-lg lined" align="left">版块</h2>
+            <div style="max-width: 100%;margin:0 auto;">
+                <div class="row">
+
+                    <div onclick="window.location.href='/top'" class="img-fluid-1" style="background: url(/static/img/portfolio/paper-presentation.jpg)">
+                        <h1 style="position: absolute;width:200px;height:50px;">留言板</h1>
+                    </div>
+
+{#                    <div onclick="window.location.href='/chat'" class="img-fluid-1" style="background: url(/static/img/portfolio/a4-paper.jpg)">#}
+{#                        <h1 style="position: absolute;width:200px;height:50px;">心理咨询</h1>#}
+{#                    </div>#}
+
+                    <div onclick="window.location.href='/res'" class="img-fluid-1" style="background: url(/static/img/portfolio/business-card.jpg)">
+                        <h1 style="position: absolute;width:200px;height:50px;">资讯</h1>
+                    </div>
+
+                    <div onclick="window.location.href='/order'" class="img-fluid-1" style="background: url(/static/img/portfolio/gravity-paper.jpg)">
+                        <h1 style="position: absolute;width:200px;height:50px;">预约与咨询</h1>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+{% endblock %}
